@@ -36,14 +36,15 @@ async function main() {
       const entry of walk(dirEntry.path, { exts: ['.mp3'], includeSymlinks: false, includeDirs: false, maxDepth: 1 })
     ) {
       const isFileBelowBitrate = await isMp3BelowBitrate(entry.path);
-      // TODO: make loglevel DEBUG print every path of every file below bitrate
       if (isFileBelowBitrate) {
-        const basePath = path.dirname(entry.path);
-        log.info(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
+        if (log.getLogger().levelName !== 'DEBUG') {
+          const basePath = path.dirname(entry.path);
+          log.info(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
 
-        log.debug(`filename: ${entry.path}`);
+          break;
+        }
 
-        break;
+        log.debug(`"${entry.path}" is below ${args.bitratelimit}kbps`);
       }
     }
   }
