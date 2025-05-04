@@ -2,7 +2,12 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/cli@*": "1.0.17",
+    "jsr:@std/fmt@^1.0.5": "1.0.7",
     "jsr:@std/fs@*": "1.0.17",
+    "jsr:@std/fs@^1.0.11": "1.0.17",
+    "jsr:@std/io@~0.225.2": "0.225.2",
+    "jsr:@std/log@*": "0.224.14",
+    "jsr:@std/log@~0.224.14": "0.224.14",
     "jsr:@std/path@*": "1.0.9",
     "jsr:@std/path@^1.0.9": "1.0.9",
     "npm:music-metadata@*": "11.2.1",
@@ -12,10 +17,24 @@
     "@std/cli@1.0.17": {
       "integrity": "e15b9abe629e17be90cc6216327f03a29eae613365f1353837fa749aad29ce7b"
     },
+    "@std/fmt@1.0.7": {
+      "integrity": "2a727c043d8df62cd0b819b3fb709b64dd622e42c3b1bb817ea7e6cc606360fb"
+    },
     "@std/fs@1.0.17": {
       "integrity": "1c00c632677c1158988ef7a004cb16137f870aafdb8163b9dce86ec652f3952b",
       "dependencies": [
         "jsr:@std/path@^1.0.9"
+      ]
+    },
+    "@std/io@0.225.2": {
+      "integrity": "3c740cd4ee4c082e6cfc86458f47e2ab7cb353dc6234d5e9b1f91a2de5f4d6c7"
+    },
+    "@std/log@0.224.14": {
+      "integrity": "257f7adceee3b53bb2bc86c7242e7d1bc59729e57d4981c4a7e5b876c808f05e",
+      "dependencies": [
+        "jsr:@std/fmt",
+        "jsr:@std/fs@^1.0.11",
+        "jsr:@std/io"
       ]
     },
     "@std/path@1.0.9": {
@@ -100,6 +119,8 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/log@~0.224.14",
+      "jsr:@std/path@^1.0.9",
       "npm:music-metadata@^11.2.1"
     ]
   }

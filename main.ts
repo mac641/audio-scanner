@@ -1,22 +1,10 @@
+import * as log from 'jsr:@std/log';
 import * as path from 'jsr:@std/path';
 import { walk } from 'jsr:@std/fs/walk';
 import { parseArgs, ParseOptions } from 'jsr:@std/cli/parse-args';
 import { type IAudioMetadata, parseFile } from 'npm:music-metadata';
 
-// TODO: add option to configure log level -> default print dirname if at least one file is below bitrate
-// - make configurable to print every path of every file below bitrate
-const cliOptions: ParseOptions = {
-  alias: {
-    path: 'p',
-    bitratelimit: 'b',
-  },
-  string: ['path'],
-  number: ['bitratelimit'],
-  default: { path: '.', bitratelimit: 320 },
-  stopEarly: true,
-};
-const args = parseArgs(Deno.args, cliOptions);
-
+// DEFINE FUNCTIONS
 async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
   try {
     const metadata: IAudioMetadata = await parseFile(filePath);
@@ -26,7 +14,7 @@ async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
       return true;
     }
   } catch (err: unknown) {
-    console.error(`Error processing ${filePath}: ${(err as Error).message}`);
+    log.error(`Error processing ${filePath}: ${(err as Error).message}`);
     Deno.exit(1);
   }
 
@@ -35,12 +23,11 @@ async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
 
 async function main() {
   const targetDir = args.path;
-  console.log(`Scanning directory: ${targetDir}`);
-  console.log(`Bitrate limit: ${args.bitratelimit}kbps`);
-  console.log('');
+  log.info(`Scanning directory: ${targetDir}`);
+  log.info(`Bitrate limit: ${args.bitratelimit}kbps`);
 
   if ((await Array.fromAsync(walk(targetDir, { exts: ['.mp3'] }))).length === 0) {
-    console.log('no files found');
+    log.info('no files found');
     Deno.exit(0);
   }
 
@@ -49,18 +36,54 @@ async function main() {
       const entry of walk(dirEntry.path, { exts: ['.mp3'], includeSymlinks: false, includeDirs: false, maxDepth: 1 })
     ) {
       const isFileBelowBitrate = await isMp3BelowBitrate(entry.path);
+      // TODO: make loglevel DEBUG print every path of every file below bitrate
       if (isFileBelowBitrate) {
         const basePath = path.dirname(entry.path);
-        console.log(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
+        log.info(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
 
-        // TODO: only print this if log level is debug
-        console.debug(`filename: ${entry.path}`);
+        log.debug(`filename: ${entry.path}`);
 
-        console.log('');
         break;
       }
     }
   }
 }
 
-main().catch(console.error);
+// PARSE CLI FLAGS
+const cliOptions: ParseOptions = {
+  alias: {
+    path: 'p',
+    bitratelimit: 'b',
+    loglevel: 'l',
+  },
+  string: ['path', 'loglevel'],
+  number: ['bitratelimit'],
+  default: { path: '.', bitratelimit: 320, loglevel: 'INFO' },
+  stopEarly: true,
+};
+const args = parseArgs(Deno.args, cliOptions);
+
+// SET UP LOGGING
+const logLevels = [
+  'DEBUG',
+  'INFO',
+  'ERROR',
+];
+if (!logLevels.includes(args.loglevel)) {
+  log.error(`Log level ${args.loglevel} not found`);
+  Deno.exit(1);
+}
+log.setup({
+  handlers: {
+    console: new log.ConsoleHandler(args.loglevel),
+  },
+  loggers: {
+    default: {
+      level: args.loglevel,
+      handlers: ['console'],
+    },
+  },
+});
+
+// RUN PROGRAM
+main().catch(log.error);

@@ -6,6 +6,8 @@
     ]
   },
   "imports": {
+    "@std/log": "jsr:@std/log@^0.224.14",
+    "@std/path": "jsr:@std/path@^1.0.9",
     "music-metadata": "npm:music-metadata@^11.2.1"
   },
   "lint": {
