@@ -34,5 +34,8 @@
     "proseWrap": "always"
   },
   "lock": true,
-  "nodeModulesDir": "auto"
+  "nodeModulesDir": "auto",
+  "exclude": [
+    "bin/"
+  ]
 }
