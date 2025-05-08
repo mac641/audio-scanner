@@ -8,7 +8,12 @@ import { type IAudioMetadata, parseFile } from 'npm:music-metadata';
 async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
   try {
     const metadata: IAudioMetadata = await parseFile(filePath);
-    const bitrateKbps = Math.round(metadata.format.bitrate / 1000);
+    const metadataBitrate = metadata.format.bitrate;
+    if (metadataBitrate === undefined) {
+      log.error(`could not get bitrate from ${filePath}`);
+      Deno.exit(1);
+    }
+    const bitrateKbps = Math.round(metadataBitrate / 1000);
 
     if (bitrateKbps < args.bitratelimit) {
       return true;
@@ -51,18 +56,27 @@ async function main() {
 }
 
 // PARSE CLI FLAGS
+const validFlags = ['bitratelimit', 'path', 'loglevel'];
 const cliOptions: ParseOptions = {
   alias: {
     path: 'p',
     bitratelimit: 'b',
     loglevel: 'l',
   },
-  string: ['path', 'loglevel'],
-  number: ['bitratelimit'],
+  string: validFlags,
   default: { path: '.', bitratelimit: 320, loglevel: 'INFO' },
-  stopEarly: true,
 };
 const args = parseArgs(Deno.args, cliOptions);
+
+const validAliases = ['p', 'b', 'l', '_'];
+const recognizedFlags = [...validAliases, ...validFlags];
+const unrecognizedFlags = Object.keys(args).filter((flag: string) => !recognizedFlags.includes(flag));
+if (unrecognizedFlags.length > 0) {
+  log.error(
+    `Unknown flags passed to audio-scanner: ${unrecognizedFlags.join(', ')}\nPlease refer to the docs for more info.`,
+  );
+  Deno.exit(1);
+}
 
 // SET UP LOGGING
 const logLevels = [
