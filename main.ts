@@ -1,8 +1,10 @@
 import * as log from 'jsr:@std/log';
 import * as path from 'jsr:@std/path';
 import { walk } from 'jsr:@std/fs/walk';
-import { parseArgs, ParseOptions } from 'jsr:@std/cli/parse-args';
 import { type IAudioMetadata, parseFile } from 'npm:music-metadata';
+import parse from './cli.ts';
+import setup from './logger.ts';
+import { Args } from 'jsr:@std/cli/parse-args';
 
 // DEFINE FUNCTIONS
 async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
@@ -55,50 +57,20 @@ async function main() {
   }
 }
 
-// PARSE CLI FLAGS
-const validFlags = ['bitratelimit', 'path', 'loglevel'];
-const cliOptions: ParseOptions = {
-  alias: {
-    path: 'p',
-    bitratelimit: 'b',
-    loglevel: 'l',
-  },
-  string: validFlags,
-  default: { path: '.', bitratelimit: 320, loglevel: 'INFO' },
-};
-const args = parseArgs(Deno.args, cliOptions);
-
-const validAliases = ['p', 'b', 'l', '_'];
-const recognizedFlags = [...validAliases, ...validFlags];
-const unrecognizedFlags = Object.keys(args).filter((flag: string) => !recognizedFlags.includes(flag));
-if (unrecognizedFlags.length > 0) {
-  log.error(
-    `Unknown flags passed to audio-scanner: ${unrecognizedFlags.join(', ')}\nPlease refer to the docs for more info.`,
-  );
-  Deno.exit(1);
-}
-
-// SET UP LOGGING
-const logLevels = [
-  'DEBUG',
-  'INFO',
-  'ERROR',
-];
-if (!logLevels.includes(args.loglevel)) {
-  log.error(`Log level ${args.loglevel} not found`);
-  Deno.exit(1);
-}
-log.setup({
-  handlers: {
-    console: new log.ConsoleHandler(args.loglevel),
-  },
-  loggers: {
-    default: {
-      level: args.loglevel,
-      handlers: ['console'],
-    },
-  },
-});
-
 // RUN PROGRAM
+let args: Args;
+try {
+  args = await parse();
+} catch (err: unknown) {
+  log.error((err as Error).message);
+  Deno.exit(1);
+}
+
+try {
+  await setup(args);
+} catch (err: unknown) {
+  log.error(`Error setting up logger: ${(err as Error).message}`);
+  Deno.exit(1);
+}
+
 main().catch(log.error);
