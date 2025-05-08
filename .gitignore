@@ -17,3 +17,4 @@ benchmarks/graphs
 dest/
 dist/
 build/
+bin/

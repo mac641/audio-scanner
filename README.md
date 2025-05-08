@@ -12,6 +12,15 @@ This repo contains a small typescript app using [Deno](https://deno.com/) to sca
 deno run --allow-read --allow-env main.ts --path /music/ --bitratelimit 128 --loglevel INFO
 ```
 
+## Compile to binary
+
+_Deno_ allows to compile projects to binaries. Use `deno compile` in order to do so.
+
+```bash
+mkdir -p bin/
+deno compile --allow-read --allow-env --output bin/audio-scanner main.ts
+```
+
 ## Configuration
 
 All flags have defaults and are optional.
