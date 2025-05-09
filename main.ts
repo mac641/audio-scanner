@@ -4,7 +4,6 @@ import { walk } from 'jsr:@std/fs/walk';
 import { type IAudioMetadata, parseFile } from 'npm:music-metadata';
 import parse from './cli.ts';
 import setup from './logger.ts';
-import { Args } from 'jsr:@std/cli/parse-args';
 
 // DEFINE FUNCTIONS
 async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
@@ -58,13 +57,7 @@ async function main() {
 }
 
 // RUN PROGRAM
-let args: Args;
-try {
-  args = await parse();
-} catch (err: unknown) {
-  log.error((err as Error).message);
-  Deno.exit(1);
-}
+const args = await parse();
 
 try {
   await setup(args);

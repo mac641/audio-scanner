@@ -33,6 +33,10 @@ Bitratelimit must be of type `number`. The scanner will detect files that are be
 
 **Default**: `320`
 
+### `--help`
+
+Help is of type boolean. The scanner will print usage info to the console.
+
 ### `--path`
 
 Path must be of type `string` pointing to an existing directory.
