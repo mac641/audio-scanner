@@ -2,13 +2,14 @@
   "compilerOptions": {
     "checkJs": true,
     "lib": [
+      "dom",
       "deno.ns"
     ]
   },
   "imports": {
     "@std/log": "jsr:@std/log@^0.224.14",
-    "@std/path": "jsr:@std/path@^1.0.9",
-    "music-metadata": "npm:music-metadata@^11.2.1"
+    "@std/path": "jsr:@std/path@^1.1.2",
+    "music-metadata": "npm:music-metadata@^11.9.0"
   },
   "lint": {
     "include": [
