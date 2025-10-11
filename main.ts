@@ -33,7 +33,7 @@ async function main() {
   log.info(`Bitrate limit: ${args.bitratelimit}kbps`);
 
   if ((await Array.fromAsync(walk(targetDir, { exts: ['.mp3'] }))).length === 0) {
-    log.info('no files found');
+    log.warn('no files found');
     Deno.exit(0);
   }
 

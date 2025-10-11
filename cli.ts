@@ -1,7 +1,7 @@
 import { Args, parseArgs, ParseOptions } from 'jsr:@std/cli/parse-args';
 
 export default async function parse(): Promise<Args> {
-  const validFlags = ['bitratelimit', 'loglevel', 'path'];
+  const validFlags = ['bitratelimit', 'loglevel', 'path', 'help'];
   const validAliases = ['p', 'b', 'l'];
   const cliOptions: ParseOptions = {
     alias: {
