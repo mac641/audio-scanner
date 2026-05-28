@@ -8,8 +8,8 @@
   },
   "imports": {
     "@std/log": "jsr:@std/log@^0.224.14",
-    "@std/path": "jsr:@std/path@^1.1.2",
-    "music-metadata": "npm:music-metadata@^11.9.0"
+    "@std/path": "jsr:@std/path@^1.1.5",
+    "music-metadata": "npm:music-metadata@^11.12.3"
   },
   "lint": {
     "include": [
