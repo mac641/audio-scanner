@@ -1,7 +1,7 @@
-import * as log from 'jsr:@std/log';
-import * as path from 'jsr:@std/path';
-import { walk } from 'jsr:@std/fs/walk';
-import { type IAudioMetadata, parseFile } from 'npm:music-metadata';
+import * as log from '@std/log';
+import * as path from '@std/path';
+import { walk } from '@std/fs/walk';
+import { type IAudioMetadata, parseFile } from 'music-metadata';
 import parse from './cli.ts';
 import setup from './logger.ts';
 
@@ -29,6 +29,12 @@ async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
 
 async function main() {
   const targetDir = args.path;
+  const targetDirStats = await Deno.stat(targetDir).catch(() => null);
+  if (targetDirStats === null || !targetDirStats.isDirectory) {
+    log.error(`"${targetDir}" is not an existing directory`);
+    Deno.exit(1);
+  }
+
   log.info(`Scanning directory: ${targetDir}`);
   log.info(`Bitrate limit: ${args.bitratelimit}kbps`);
 
@@ -57,10 +63,10 @@ async function main() {
 }
 
 // RUN PROGRAM
-const args = await parse();
+const args = parse();
 
 try {
-  await setup(args);
+  setup(args);
 } catch (err: unknown) {
   log.error(`Error setting up logger: ${(err as Error).message}`);
   Deno.exit(1);
