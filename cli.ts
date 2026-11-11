@@ -71,7 +71,15 @@ function parsePath(positionals: Array<string | number>): string {
     Deno.exit(1);
   }
 
-  return String(positionals[0]);
+  // parseArgs converts number-like positionals (e.g. "007") to numbers, so read the raw last argument instead
+  const lastArg = Deno.args.at(-1);
+  if (lastArg === undefined || (positionals[0] !== lastArg && positionals[0] !== Number(lastArg))) {
+    console.error('error: search path has to be passed as the last argument\n');
+    printHelp();
+    Deno.exit(1);
+  }
+
+  return lastArg;
 }
 
 function isLogLevel(value: string | number | boolean | undefined): value is LevelName {
