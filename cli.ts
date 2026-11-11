@@ -1,7 +1,7 @@
 import type { LevelName } from '@std/log';
 import { parseArgs, type ParseOptions } from '@std/cli/parse-args';
 
-const validLogLevels: LevelName[] = ['DEBUG', 'INFO', 'ERROR'];
+const validLogLevels: LevelName[] = ['DEBUG', 'INFO', 'WARN', 'ERROR', 'CRITICAL'];
 
 export interface CliArgs {
   path: string;
@@ -94,7 +94,7 @@ function printHelp(): void {
   console.log('');
   console.log('Options:');
   console.log('  --bitratelimit | -b   Specify bitrate limit in kbps');
-  console.log('  --loglevel | -l       Specify log level: ERROR, INFO, DEBUG');
+  console.log('  --loglevel | -l       Specify log level: CRITICAL, ERROR, WARN, INFO, DEBUG');
   console.log('  --help                Show help information');
   console.log('');
   console.log('Examples:');

@@ -54,7 +54,8 @@ Help is of type boolean. The scanner will print usage info to the console.
 
 ### `--loglevel`
 
-Log level must be of type `string`. Available log levels are `ERROR`, `INFO` and `DEBUG`. Log levels are case-sensitive.
+Log level must be of type `string`. Available log levels are `CRITICAL`, `ERROR`, `WARN`, `INFO` and `DEBUG`. Log levels
+are case-sensitive.
 
 **Alias**: `-l`
 
