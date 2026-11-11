@@ -33,21 +33,21 @@ export default function parse(): CliArgs {
   const unrecognizedFlags = Object.keys(args).filter((flag: string) => !validArgsObjectKeys.includes(flag));
   if (unrecognizedFlags.length > 0) {
     console.error(`error: unknown flag(s): ${unrecognizedFlags.join(', ')}\n`);
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
   const bitratelimit = Number(args.bitratelimit);
   if (String(args.bitratelimit).trim() === '' || !Number.isFinite(bitratelimit) || bitratelimit <= 0) {
     console.error(`error: bitratelimit must be a positive number, got "${args.bitratelimit}"\n`);
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
   const loglevel = args.loglevel;
   if (!isLogLevel(loglevel)) {
     console.error(`error: loglevel must be one of ${validLogLevels.join(', ')}, got "${loglevel}"\n`);
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
@@ -61,13 +61,13 @@ export default function parse(): CliArgs {
 function parsePath(positionals: Array<string | number>): string {
   if (positionals.length === 0) {
     console.error('error: missing search path\n');
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
   if (positionals.length > 1) {
     console.error(`error: expected a single search path, got: ${positionals.join(', ')}\n`);
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
@@ -75,7 +75,7 @@ function parsePath(positionals: Array<string | number>): string {
   const lastArg = Deno.args.at(-1);
   if (lastArg === undefined || (positionals[0] !== lastArg && positionals[0] !== Number(lastArg))) {
     console.error('error: search path has to be passed as the last argument\n');
-    printHelp();
+    printHelp(console.error);
     Deno.exit(1);
   }
 
@@ -86,17 +86,17 @@ function isLogLevel(value: string | number | boolean | undefined): value is Leve
   return typeof value === 'string' && (validLogLevels as string[]).includes(value);
 }
 
-function printHelp(): void {
-  console.log('Usage: audio-scanner [options] <path>');
-  console.log('');
-  console.log('Scans <path> for mp3 files below the given bitrate limit.');
-  console.log('<path> has to be passed as the last argument');
-  console.log('');
-  console.log('Options:');
-  console.log('  --bitratelimit | -b   Specify bitrate limit in kbps');
-  console.log('  --loglevel | -l       Specify log level: CRITICAL, ERROR, WARN, INFO, DEBUG');
-  console.log('  --help                Show help information');
-  console.log('');
-  console.log('Examples:');
-  console.log('  audio-scanner -b 128 /music');
+function printHelp(print: (line: string) => void = console.log): void {
+  print('Usage: audio-scanner [options] <path>');
+  print('');
+  print('Scans <path> for mp3 files below the given bitrate limit.');
+  print('<path> has to be passed as the last argument');
+  print('');
+  print('Options:');
+  print('  --bitratelimit | -b   Specify bitrate limit in kbps');
+  print('  --loglevel | -l       Specify log level: CRITICAL, ERROR, WARN, INFO, DEBUG');
+  print('  --help                Show help information');
+  print('');
+  print('Examples:');
+  print('  audio-scanner -b 128 /music');
 }
