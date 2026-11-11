@@ -29,7 +29,12 @@ async function isMp3BelowBitrate(filePath: string): Promise<boolean> {
 
 async function main() {
   const targetDir = args.path;
-  const targetDirStats = await Deno.stat(targetDir).catch(() => null);
+  const targetDirStats = await Deno.stat(targetDir).catch((err: unknown) => {
+    if (err instanceof Deno.errors.NotFound) {
+      return null;
+    }
+    throw err;
+  });
   if (targetDirStats === null || !targetDirStats.isDirectory) {
     log.error(`"${targetDir}" is not an existing directory`);
     Deno.exit(1);
