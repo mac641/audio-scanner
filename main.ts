@@ -70,11 +70,6 @@ async function main() {
 // RUN PROGRAM
 const args = parse();
 
-try {
-  setup(args);
-} catch (err: unknown) {
-  log.error(`Error setting up logger: ${(err as Error).message}`);
-  Deno.exit(1);
-}
+setup(args);
 
 main().catch(log.error);
