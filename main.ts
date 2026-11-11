@@ -49,20 +49,31 @@ async function main() {
     Deno.exit(0);
   }
 
+  const resolvedTargetDir = path.resolve(targetDir);
   for await (const dirEntry of walk(targetDir, { includeFiles: false, includeSymlinks: false })) {
-    for await (
-      const entry of walk(dirEntry.path, { exts: ['.mp3'], includeSymlinks: false, includeDirs: false, maxDepth: 1 })
-    ) {
+    const entries = await Array.fromAsync(
+      walk(dirEntry.path, { exts: ['.mp3'], includeSymlinks: false, includeDirs: false, maxDepth: 1 }),
+    );
+    // files are listed individually in the base directory, since listing the base directory itself is useless, and in
+    // directories with a single file, since "contains at least one file" makes no sense there
+    const listFilesIndividually = entries.length === 1 || path.resolve(dirEntry.path) === resolvedTargetDir;
+    for (const entry of entries) {
       const isFileBelowBitrate = await isMp3BelowBitrate(entry.path);
       if (isFileBelowBitrate) {
-        if (log.getLogger().levelName !== 'DEBUG') {
-          const basePath = path.dirname(entry.path);
-          log.info(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
-
-          break;
+        if (log.getLogger().levelName === 'DEBUG') {
+          log.debug(`"${entry.path}" is below ${args.bitratelimit}kbps`);
+          continue;
         }
 
-        log.debug(`"${entry.path}" is below ${args.bitratelimit}kbps`);
+        if (listFilesIndividually) {
+          log.info(`"${entry.path}" is below ${args.bitratelimit}kbps`);
+          continue;
+        }
+
+        const basePath = path.dirname(entry.path);
+        log.info(`"${basePath}" contains at least one file below ${args.bitratelimit}kbps`);
+
+        break;
       }
     }
   }
