@@ -38,8 +38,8 @@ export default function parse(): CliArgs {
   }
 
   const bitratelimit = Number(args.bitratelimit);
-  if (!Number.isFinite(bitratelimit)) {
-    console.error(`error: bitratelimit must be a number, got "${args.bitratelimit}"\n`);
+  if (String(args.bitratelimit).trim() === '' || !Number.isFinite(bitratelimit) || bitratelimit <= 0) {
+    console.error(`error: bitratelimit must be a positive number, got "${args.bitratelimit}"\n`);
     printHelp();
     Deno.exit(1);
   }
