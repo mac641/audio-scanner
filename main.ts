@@ -43,7 +43,8 @@ async function main() {
   log.info(`Scanning directory: ${targetDir}`);
   log.info(`Bitrate limit: ${args.bitratelimit}kbps`);
 
-  if ((await Array.fromAsync(walk(targetDir, { exts: ['.mp3'] }))).length === 0) {
+  const hasMp3Files = !(await walk(targetDir, { exts: ['.mp3'] })[Symbol.asyncIterator]().next()).done;
+  if (!hasMp3Files) {
     log.warn('no files found');
     Deno.exit(0);
   }
